@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:dartz/dartz.dart';
 import 'package:laundry_flutter/config/app_request.dart';
 import 'package:laundry_flutter/config/app_response.dart';

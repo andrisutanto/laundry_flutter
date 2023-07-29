@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry_flutter/config/app_colors.dart';
 import 'package:laundry_flutter/pages/auth/register_page.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(
+    const ProviderScope(
+      child: const MainApp(),
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {

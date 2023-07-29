@@ -5,6 +5,7 @@ import 'package:d_view/d_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry_flutter/config/app_assets.dart';
 import 'package:laundry_flutter/config/app_colors.dart';
@@ -12,15 +13,16 @@ import 'package:laundry_flutter/config/app_constants.dart';
 import 'package:laundry_flutter/config/app_response.dart';
 import 'package:laundry_flutter/config/failure.dart';
 import 'package:laundry_flutter/datasources/user_datasource.dart';
+import 'package:laundry_flutter/providers/register_provider.dart';
 
-class RegisterPage extends StatefulWidget {
+class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  ConsumerState<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterPageState extends ConsumerState<RegisterPage> {
   final edtUsername = TextEditingController();
   final edtEmail = TextEditingController();
   final edtPassword = TextEditingController();
@@ -30,12 +32,15 @@ class _RegisterPageState extends State<RegisterPage> {
     bool validInput = formKey.currentState!.validate();
     if (!validInput) return;
 
+    setRegisterStatus(ref, 'Loading');
+
     UserDatasource.register(
       edtUsername.text,
       edtEmail.text,
       edtPassword.text,
     ).then((value) {
       String newStatus = '';
+
       value.fold(
         (failure) {
           switch (failure.runtimeType) {
@@ -69,9 +74,13 @@ class _RegisterPageState extends State<RegisterPage> {
               newStatus = failure.message ?? '-';
               break;
           }
+
+          //panggil state provider disini
+          setRegisterStatus(ref, newStatus);
         },
         (result) {
           DInfo.toastSuccess('Register Success');
+          setRegisterStatus(ref, 'Success');
         },
       );
     });
@@ -247,13 +256,21 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             DView.spaceWidth(10),
                             Expanded(
-                              child: ElevatedButton(
-                                onPressed: () => execute(),
-                                style: const ButtonStyle(
-                                  alignment: Alignment.centerLeft,
-                                ),
-                                child: const Text('Register'),
-                              ),
+                              child: Consumer(builder: (_, wiRef, __) {
+                                String status =
+                                    wiRef.watch(registerStatusProvider);
+
+                                if (status == 'Loading') {
+                                  return DView.loadingCircle();
+                                }
+                                return ElevatedButton(
+                                  onPressed: () => execute(),
+                                  style: const ButtonStyle(
+                                    alignment: Alignment.centerLeft,
+                                  ),
+                                  child: const Text('Register'),
+                                );
+                              }),
                             ),
                           ],
                         ),
