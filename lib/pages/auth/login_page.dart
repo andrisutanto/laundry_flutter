@@ -11,10 +11,12 @@ import 'package:laundry_flutter/config/app_assets.dart';
 import 'package:laundry_flutter/config/app_colors.dart';
 import 'package:laundry_flutter/config/app_constants.dart';
 import 'package:laundry_flutter/config/app_response.dart';
+import 'package:laundry_flutter/config/app_session.dart';
 import 'package:laundry_flutter/config/failure.dart';
 import 'package:laundry_flutter/datasources/user_datasource.dart';
+import 'package:laundry_flutter/pages/auth/dashboard_page.dart';
 import 'package:laundry_flutter/pages/auth/register_page.dart';
-import 'package:laundry_flutter/providers/register_provider.dart';
+import 'package:laundry_flutter/providers/login_provider.dart';
 
 import '../../config/nav.dart';
 
@@ -31,61 +33,66 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final formKey = GlobalKey<FormState>();
 
   execute() {
-    // bool validInput = formKey.currentState!.validate();
-    // if (!validInput) return;
+    bool validInput = formKey.currentState!.validate();
+    if (!validInput) return;
 
-    // setRegisterStatus(ref, 'Loading');
+    setLoginStatus(ref, 'Loading');
 
-    // UserDatasource.register(
-    //   edtUsername.text,
-    //   edtEmail.text,
-    //   edtPassword.text,
-    // ).then((value) {
-    //   String newStatus = '';
+    UserDatasource.login(
+      edtEmail.text,
+      edtPassword.text,
+    ).then((value) {
+      String newStatus = '';
 
-    //   value.fold(
-    //     (failure) {
-    //       switch (failure.runtimeType) {
-    //         case ServerFailure:
-    //           newStatus = 'Server Error';
-    //           DInfo.toastError(newStatus);
-    //           break;
-    //         case NotFoundFailure:
-    //           newStatus = 'Error Not Found';
-    //           DInfo.toastError(newStatus);
-    //           break;
-    //         case ForbiddenFailure:
-    //           newStatus = 'You don\'t have access';
-    //           DInfo.toastError(newStatus);
-    //           break;
-    //         case BadRequestFailure:
-    //           newStatus = 'Bad Request';
-    //           DInfo.toastError(newStatus);
-    //           break;
-    //         case InvalidInputFailure:
-    //           newStatus = 'Invalid Input';
-    //           AppResponse.invalidInput(context, failure.message ?? '{}');
-    //           break;
-    //         case UnauthorisedFailure:
-    //           newStatus = 'Unauthorised';
-    //           DInfo.toastError(newStatus);
-    //           break;
-    //         default:
-    //           newStatus = 'Request Error';
-    //           DInfo.toastError(newStatus);
-    //           newStatus = failure.message ?? '-';
-    //           break;
-    //       }
+      value.fold(
+        (failure) {
+          switch (failure.runtimeType) {
+            case ServerFailure:
+              newStatus = 'Server Error';
+              DInfo.toastError(newStatus);
+              break;
+            case NotFoundFailure:
+              newStatus = 'Error Not Found';
+              DInfo.toastError(newStatus);
+              break;
+            case ForbiddenFailure:
+              newStatus = 'You don\'t have access';
+              DInfo.toastError(newStatus);
+              break;
+            case BadRequestFailure:
+              newStatus = 'Bad Request';
+              DInfo.toastError(newStatus);
+              break;
+            case InvalidInputFailure:
+              newStatus = 'Invalid Input';
+              AppResponse.invalidInput(context, failure.message ?? '{}');
+              break;
+            case UnauthorisedFailure:
+              newStatus = 'Unauthorised';
+              DInfo.toastError(newStatus);
+              break;
+            default:
+              newStatus = 'Request Error';
+              DInfo.toastError(newStatus);
+              newStatus = failure.message ?? '-';
+              break;
+          }
 
-    //       //panggil state provider disini
-    //       setRegisterStatus(ref, newStatus);
-    //     },
-    //     (result) {
-    //       DInfo.toastSuccess('Register Success');
-    //       setRegisterStatus(ref, 'Success');
-    //     },
-    //   );
-    // });
+          //panggil state provider disini
+          setLoginStatus(ref, newStatus);
+        },
+        (result) {
+          AppSession.setUser(result['data']);
+          AppSession.setBearerToken(result['token']);
+          DInfo.toastSuccess('Login Success');
+          setLoginStatus(ref, 'Success');
+          Nav.replace(
+            context,
+            const DashboardPage(),
+          );
+        },
+      );
+    });
   }
 
   @override
@@ -231,7 +238,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             Expanded(
                               child: Consumer(builder: (_, wiRef, __) {
                                 String status =
-                                    wiRef.watch(registerStatusProvider);
+                                    wiRef.watch(loginStatusProvider);
 
                                 if (status == 'Loading') {
                                   return DView.loadingCircle();
