@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry_flutter/config/app_colors.dart';
 import 'package:laundry_flutter/config/app_session.dart';
-import 'package:laundry_flutter/pages/auth/dashboard_page.dart';
+import 'package:laundry_flutter/pages/dashboard_page.dart';
 import 'package:laundry_flutter/pages/auth/login_page.dart';
 import 'package:laundry_flutter/pages/auth/register_page.dart';
 

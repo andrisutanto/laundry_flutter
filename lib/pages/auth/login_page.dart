@@ -14,7 +14,7 @@ import 'package:laundry_flutter/config/app_response.dart';
 import 'package:laundry_flutter/config/app_session.dart';
 import 'package:laundry_flutter/config/failure.dart';
 import 'package:laundry_flutter/datasources/user_datasource.dart';
-import 'package:laundry_flutter/pages/auth/dashboard_page.dart';
+import 'package:laundry_flutter/pages/dashboard_page.dart';
 import 'package:laundry_flutter/pages/auth/register_page.dart';
 import 'package:laundry_flutter/providers/login_provider.dart';
 
