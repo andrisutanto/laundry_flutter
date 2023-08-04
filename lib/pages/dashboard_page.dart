@@ -15,6 +15,7 @@ class DashboardPage extends StatelessWidget {
       body: Consumer(
         builder: (_, ref, __) {
           int navIndex = ref.watch(dashboardNavIndexProvider);
+          //int navIndex = 2;
           return AppConstants.navMenuDashboard[navIndex]['view'] as Widget;
         },
       ),

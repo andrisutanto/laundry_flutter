@@ -5,7 +5,7 @@ import 'package:laundry_flutter/pages/dashboard_views/account_view.dart';
 class AppConstants {
   static const appName = 'Laundry';
 
-  static const _host = 'http://192.168.0.102:8000';
+  static const _host = 'http://192.168.0.103:8000';
 
   // ``` base URL ```
   static const baseURL = '$_host/api';
