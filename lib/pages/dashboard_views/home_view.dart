@@ -5,6 +5,8 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:laundry_flutter/config/app_colors.dart';
+import 'package:laundry_flutter/config/app_constants.dart';
 import 'package:laundry_flutter/config/failure.dart';
 import 'package:laundry_flutter/config/nav.dart';
 import 'package:laundry_flutter/datasources/promo_datasource.dart';
@@ -110,94 +112,179 @@ class _HomeViewState extends ConsumerState<HomeView> {
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(30, 20, 30, 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              title(),
-              const SizedBox(
-                height: 6,
-              ),
-              subtitle(),
-              const SizedBox(
-                height: 20,
-              ),
-              Column(
-                children: [
-                  Row(
+        header(),
+        categories(),
+        const SizedBox(
+          height: 20,
+        ),
+        Consumer(
+          builder: (_, wiRef, __) {
+            List<PromoModel> list = wiRef.watch(homePromoListProvider);
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Icon(
-                        Icons.location_city,
-                        color: Colors.green,
-                        size: 20,
-                      ),
-                      DView.spaceWidth(4),
-                      Text(
-                        'Find By City',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w300,
-                          color: Colors.grey[600],
-                        ),
-                      ),
+                      DView.textTitle('Promo', color: Colors.black),
+                      DView.textAction(() {}, color: AppColors.primary),
                     ],
                   ),
-                  const SizedBox(
-                    height: 8,
+                ),
+                if (list.isEmpty) DView.empty('No Promo'),
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Consumer categories() {
+    return Consumer(
+      builder: (_, wiRef, __) {
+        //watch ini agar setiap perubahan langsung berubah
+        String categorySelected = wiRef.watch(homeCategoryProvider);
+        return SizedBox(
+          height: 30,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: AppConstants.homeCategories.length,
+            itemBuilder: (context, index) {
+              String category = AppConstants.homeCategories[index];
+              return Padding(
+                padding: EdgeInsets.fromLTRB(
+                  index == 0 ? 30 : 8,
+                  0,
+                  index == AppConstants.homeCategories.length - 1 ? 30 : 8,
+                  0,
+                ),
+                child: InkWell(
+                  onTap: () {
+                    setHomeCategory(ref, category);
+                  },
+                  borderRadius: BorderRadius.circular(30),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: categorySelected == category
+                            ? Colors.green
+                            : Colors.grey[400]!,
+                      ),
+                      color: categorySelected == category
+                          ? Colors.green
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(
+                      category,
+                      style: TextStyle(
+                        height: 1,
+                        color: categorySelected == category
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                    ),
                   ),
-                  // Intrinsic Height ini digunakan agar row mengikuti row yang paling tinggi
-                  IntrinsicHeight(
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.green[50],
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Row(
-                              children: [
-                                IconButton(
-                                  onPressed: () => gotoSearchCity(),
-                                  icon: const Icon(Icons.search),
-                                ),
-                                Expanded(
-                                  child: TextField(
-                                    controller: edtSearch,
-                                    decoration: const InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: 'Search...',
-                                    ),
-                                    onSubmitted: (value) => gotoSearchCity(),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 6,
-                        ),
-                        DButtonElevation(
-                          onClick: () {},
-                          mainColor: Colors.green,
-                          splashColor: Colors.greenAccent,
-                          width: 50,
-                          radius: 10,
-                          child: const Icon(
-                            Icons.tune,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Padding header() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(30, 20, 30, 30),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          title(),
+          const SizedBox(
+            height: 6,
+          ),
+          subtitle(),
+          const SizedBox(
+            height: 20,
+          ),
+          Column(
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    Icons.location_city,
+                    color: Colors.green,
+                    size: 20,
+                  ),
+                  DView.spaceWidth(4),
+                  Text(
+                    'Find By City',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w300,
+                      color: Colors.grey[600],
                     ),
                   ),
                 ],
               ),
+              const SizedBox(
+                height: 8,
+              ),
+              // Intrinsic Height ini digunakan agar row mengikuti row yang paling tinggi
+              IntrinsicHeight(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.green[50],
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          children: [
+                            IconButton(
+                              onPressed: () => gotoSearchCity(),
+                              icon: const Icon(Icons.search),
+                            ),
+                            Expanded(
+                              child: TextField(
+                                controller: edtSearch,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: 'Search...',
+                                ),
+                                onSubmitted: (value) => gotoSearchCity(),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 6,
+                    ),
+                    DButtonElevation(
+                      onClick: () {},
+                      mainColor: Colors.green,
+                      splashColor: Colors.greenAccent,
+                      width: 50,
+                      radius: 10,
+                      child: const Icon(
+                        Icons.tune,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
